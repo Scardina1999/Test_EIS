@@ -7,9 +7,9 @@ Viene applicato un modello di circuito equivalente per il fitting dei dati speri
 ---
 
 ## 📂 Struttura del Progetto
-- **`test_impedence.py`** → Script principale per analizzare i dati EIS.
-- **`test_impedence.ipynb`** → Versione notebook dello script, per un'esecuzione interattiva.
-- **`dati.csv`** → File CSV contenente i dati di impedenza sperimentali.
+- **`test_impedance.py`** → Script principale per analizzare i dati EIS.
+- **`test_impedance.ipynb`** → Versione notebook dello script, per un'esecuzione interattiva.
+- **`data.csv`** → File CSV contenente i dati di impedenza sperimentali.
 - **`risultati_fit.csv`** → File CSV con i parametri del circuito equivalente ottenuti dal fitting.
 - **`README.md`** → Documentazione del progetto.
 
