@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import tkinter as tk
+from tkinter import filedialog
 from impedance import preprocessing
 from impedance.models.circuits import CustomCircuit
 from impedance.visualization import plot_nyquist
@@ -8,7 +10,6 @@ from impedance.visualization import plot_nyquist
 
 def load_data(file_path):
     """Carica i dati dal file CSV in un formato compatibile."""
-    
     # Carica il CSV
     df = pd.read_csv(file_path)
 
@@ -56,9 +57,17 @@ def visualize_data(Z, Z_fit, frequencies):
 
 
 def main():
-    """Esegue l'analisi completa."""
     # Percorso del file CSV
-    file_path = './data_test_eis_pouch_1.csv'
+    # Apri finestra di selezione file
+    root = tk.Tk()
+    # Nasconde la finestra principale
+    root.withdraw()  
+    file_path = filedialog.askopenfilename(title="Seleziona il file CSV",
+                                           filetypes=[("CSV files", "*.csv")])
+
+    if not file_path:  # Se l'utente chiude la finestra senza selezionare un file
+        print("Nessun file selezionato. Uscita dal programma.")
+        return
 
     # Carica i dati
     frequencies, Z = load_data(file_path)
