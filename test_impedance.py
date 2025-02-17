@@ -21,7 +21,6 @@ def load_data(file_path):
         ImZ = df["X(ohm)"].values
 
         # Costruzione dell'impedenza complessa
-
         Z = ReZ + 1j * ImZ
 
         return frequencies, Z
