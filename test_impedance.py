@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 import matplotlib.pyplot as plt
 from impedance import preprocessing
 from impedance.models.circuits import CustomCircuit
@@ -6,9 +7,25 @@ from impedance.visualization import plot_nyquist
 
 
 def load_data(file_path):
-    """Carica i dati dal file CSV."""
-    frequencies, Z = preprocessing.readCSV(file_path)
-    return frequencies, Z
+    """Carica i dati dal file CSV in un formato compatibile."""
+    
+    # Carica il CSV
+    df = pd.read_csv(file_path)
+
+    # Controlliamo se il file ha le colonne corrette
+    if "FREQUENCY(Hz)" in df.columns and "R(ohm)" in df.columns and "X(ohm)" in df.columns:
+        # Estraiamo le colonne necessarie
+        frequencies = df["FREQUENCY(Hz)"].values
+        ReZ = df["R(ohm)"].values
+        ImZ = df["X(ohm)"].values
+
+        # Costruzione dell'impedenza complessa
+
+        Z = ReZ + 1j * ImZ
+
+        return frequencies, Z
+    else:
+        raise ValueError("Errore: Il file CSV non contiene le colonne attese!")
 
 
 def filter_data(frequencies, Z):
@@ -41,7 +58,7 @@ def visualize_data(Z, Z_fit, frequencies):
 def main():
     """Esegue l'analisi completa."""
     # Percorso del file CSV
-    file_path = './data.csv'
+    file_path = './data_test_eis_pouch_1.csv'
 
     # Carica i dati
     frequencies, Z = load_data(file_path)
