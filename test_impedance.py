@@ -42,8 +42,8 @@ def define_circuit():
     return circuit
 
 
-def visualize_data(Z, Z_fit, frequencies):
-    """Visualizza il diagramma di Nyquist."""
+def visualize_data(Z, Z_fit, frequencies, circuit):
+    """Visualizza il diagramma di Nyquist e Bode."""
     fig, ax = plt.subplots()
     plot_nyquist(Z, fmt='o', scale=10, ax=ax)
     plot_nyquist(Z_fit, fmt='-', scale=10, ax=ax)
@@ -52,6 +52,13 @@ def visualize_data(Z, Z_fit, frequencies):
     plt.xlabel('Re(Z) [Ohm]')
     plt.ylabel('-Im(Z) [Ohm]')
     plt.grid()
+    plt.show()
+
+    # Diagramma di Bode
+    fig_bode, ax_bode = plt.subplots()
+    circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=ax_bode)
+    
+    plt.title("Diagramma di Bode")
     plt.show()
 
 
@@ -87,7 +94,7 @@ def main():
     print("Mean error:", np.mean(np.abs(error)))
 
     # Visualizza i dati e il modello adattato
-    visualize_data(Z, Z_fit, frequencies)
+    visualize_data(Z, Z_fit, frequencies, circuit)
 
 
 if __name__ == "__main__":
