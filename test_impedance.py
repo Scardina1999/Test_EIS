@@ -37,13 +37,13 @@ def filter_data(frequencies, Z):
 def define_circuit():
     """Definisce il modello del circuito equivalente."""
     circuit_string = 'R0-p(R1,C1)-p(R2-Wo1,C2)'
-    initial_guess = [0.1, 0.1, 10, 0.1, 0.1, 10, 1]
+    initial_guess = [0.0001, 0.001, 1000, 0.001, 0.001, 1000, 0.01]
     circuit = CustomCircuit(circuit_string, initial_guess=initial_guess)
     return circuit
 
 
-def visualize_data(Z, Z_fit, frequencies, circuit):
-    """Visualizza il diagramma di Nyquist e Bode."""
+def visualize_data(Z, Z_fit, frequencies):
+    """Visualizza il diagramma di Nyquist."""
     fig, ax = plt.subplots()
     plot_nyquist(Z, fmt='o', scale=10, ax=ax)
     plot_nyquist(Z_fit, fmt='-', scale=10, ax=ax)
@@ -52,22 +52,16 @@ def visualize_data(Z, Z_fit, frequencies, circuit):
     plt.xlabel('Re(Z) [Ohm]')
     plt.ylabel('-Im(Z) [Ohm]')
     plt.grid()
-    plt.show()
-
-    # Diagramma di Bode
-    fig_bode, ax_bode = plt.subplots()
-    circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=ax_bode)
-    
-    plt.title("Diagramma di Bode")
+    plt.tight_layout()
     plt.show()
 
 
 def main():
-    # Percorso del file CSV
     # Apri finestra di selezione file
     root = tk.Tk()
     # Nasconde la finestra principale
     root.withdraw()  
+    # Percorso del file CSV
     file_path = filedialog.askopenfilename(title="Seleziona il file CSV",
                                            filetypes=[("CSV files", "*.csv")])
 
@@ -94,7 +88,7 @@ def main():
     print("Mean error:", np.mean(np.abs(error)))
 
     # Visualizza i dati e il modello adattato
-    visualize_data(Z, Z_fit, frequencies, circuit)
+    visualize_data(Z, Z_fit, frequencies)
 
 
 if __name__ == "__main__":
