@@ -43,7 +43,7 @@ def visualize_data(frequencies_list, Z_list, Z_fit_list, circuit_list, file_name
         plot_nyquist(Z_fit, ax=ax_nyquist, linestyle='-', color=color, label=f'Fit {file_name}')
 
         # **DIAGRAMMA DI BODE**
-        circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=[ax_bode_mag, ax_bode_phase], color=color, label=f'{file_name}')
+        circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=[ax_bode_mag, ax_bode_phase], color=color)
 
     # **Aggiunta legende corrette**
     ax_nyquist.legend(loc="best")
@@ -56,7 +56,7 @@ def visualize_data(frequencies_list, Z_list, Z_fit_list, circuit_list, file_name
     ax_bode_mag.set_xlabel("f [Hz]")
     ax_bode_mag.set_ylabel("|Z(ω)| [Ohms]")
     ax_bode_mag.grid()
-    ax_bode_mag.legend(['Data', 'Fit'], loc="best")
+    ax_bode_mag.legend([f'Dati {file_name}', f'Fit {file_name}'], loc="best")
 
     ax_bode_phase.set_title("Bode Diagram - Phase")
     ax_bode_phase.set_xlabel("f [Hz]")
