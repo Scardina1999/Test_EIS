@@ -10,85 +10,107 @@ from impedance.visualization import plot_nyquist
 
 def load_data(file_path):
     """Carica i dati dal file CSV in un formato compatibile."""
-    # Carica il CSV
     df = pd.read_csv(file_path)
 
-    # Controlliamo se il file ha le colonne corrette
     if "FREQUENCY(Hz)" in df.columns and "R(ohm)" in df.columns and "X(ohm)" in df.columns:
-        # Estraiamo le colonne necessarie
         frequencies = df["FREQUENCY(Hz)"].values
         ReZ = df["R(ohm)"].values
         ImZ = df["X(ohm)"].values
 
-        # Costruzione dell'impedenza complessa
         Z = ReZ + 1j * ImZ
 
-        return frequencies, Z
+        # Ordina le frequenze in ordine crescente
+        sorted_indices = np.argsort(frequencies)
+        return frequencies[sorted_indices], Z[sorted_indices]
     else:
         raise ValueError("Errore: Il file CSV non contiene le colonne attese!")
 
 
 def filter_data(frequencies, Z):
     """Filtra i dati per mantenere solo il primo quadrante."""
-    frequencies, Z = preprocessing.ignoreBelowX(frequencies, Z)
-    return frequencies, Z
+    return preprocessing.ignoreBelowX(frequencies, Z)
 
 
 def define_circuit():
     """Definisce il modello del circuito equivalente."""
     circuit_string = 'R0-p(R1,C1)-p(R2-Wo1,C2)'
     initial_guess = [0.01, 0.001, 10, 0.001, 0.001, 10, 1]
-    circuit = CustomCircuit(circuit_string, initial_guess=initial_guess)
-    return circuit
+    return CustomCircuit(circuit_string, initial_guess=initial_guess)
 
 
-def visualize_data(Z, Z_fit, frequencies):
-    """Visualizza il diagramma di Nyquist."""
-    fig, ax = plt.subplots()
-    plot_nyquist(Z, fmt='o', scale=10, ax=ax)
-    plot_nyquist(Z_fit, fmt='-', scale=10, ax=ax)
+def visualize_data(frequencies_list, Z_list, Z_fit_list, circuit_list, file_names):
+    """Visualizza il diagramma di Nyquist e il diagramma di Bode per più dataset."""
+    
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
 
-    plt.legend(['Data', 'Fit'])
-    plt.xlabel('Re(Z) [Ohm]')
-    plt.ylabel('-Im(Z) [Ohm]')
-    plt.grid()
+    ax_nyquist = axes[0, 0]
+    ax_bode_mag = axes[0, 1]
+    ax_bode_phase = axes[1, 1]
+
+    for i, (frequencies, Z, Z_fit, circuit, file_name) in enumerate(zip(frequencies_list, Z_list, Z_fit_list, circuit_list, file_names)):
+        # **DIAGRAMMA DI NYQUIST**
+        plot_nyquist(Z, ax=ax_nyquist, fmt='o')
+        plot_nyquist(Z_fit, ax=ax_nyquist, fmt='-')
+        
+        # **DIAGRAMMA DI BODE (Modulo e Fase)**
+        circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=[ax_bode_mag, ax_bode_phase])
+
+    # Titoli e legende
+    ax_nyquist.set_title("Nyquist Diagram")
+    ax_nyquist.set_xlabel("Re(Z) [Ohm]")
+    ax_nyquist.set_ylabel("-Im(Z) [Ohm]")
+    ax_nyquist.legend(file_names, loc="best")
+    ax_nyquist.grid()
+
+    ax_bode_mag.set_title("Bode Diagram - Magnitude")
+    ax_bode_phase.set_title("Bode Diagram - Phase")
+    
+    ax_bode_mag.grid()
+    ax_bode_phase.grid()
+
     plt.tight_layout()
     plt.show()
 
 
 def main():
-    # Apri finestra di selezione file
+    """Main function per la selezione e l'analisi di più file."""
     root = tk.Tk()
-    # Nasconde la finestra principale
-    root.withdraw()  
-    # Percorso del file CSV
-    file_path = filedialog.askopenfilename(title="Seleziona il file CSV",
-                                           filetypes=[("CSV files", "*.csv")])
+    root.withdraw()
+    
+    # Seleziona più file CSV
+    file_paths = filedialog.askopenfilenames(title="Seleziona i file CSV",
+                                             filetypes=[("CSV files", "*.csv")])
 
-    if not file_path:  # Se l'utente chiude la finestra senza selezionare un file
+    if not file_paths:
         print("Nessun file selezionato. Uscita dal programma.")
         return
 
-    # Carica i dati
-    frequencies, Z = load_data(file_path)
+    frequencies_list, Z_list, Z_fit_list, circuit_list, file_names = [], [], [], [], []
 
-    # Filtra i dati
-    frequencies, Z = filter_data(frequencies, Z)
+    for file_path in file_paths:
+        print(f"\nAnalizzando: {file_path.split('/')[-1]}")
 
-    # Definisci il circuito e adatta i parametri
-    circuit = define_circuit()
-    circuit.fit(frequencies, Z)
-    Z_fit = circuit.predict(frequencies)
+        # Carica e filtra i dati
+        frequencies, Z = load_data(file_path)
+        frequencies, Z = filter_data(frequencies, Z)
 
-    # Stampa i parametri stimati
-    print("Estimated parameters:", circuit.parameters_)
+        # Definisci e adatta il modello del circuito
+        circuit = define_circuit()
+        circuit.fit(frequencies, Z)
+        Z_fit = circuit.predict(frequencies)
 
-    # Calcola l'errore medio
-    error = Z - Z_fit
-    print("Mean error:", np.mean(np.abs(error)))
+        # Stampa i parametri stimati
+        print("Estimated parameters:", circuit.parameters_)
 
-    # Visualizza i dati e il modello adattato
-    visualize_data(Z, Z_fit, frequencies)
+        # Memorizza i dati per la visualizzazione
+        frequencies_list.append(frequencies)
+        Z_list.append(Z)
+        Z_fit_list.append(Z_fit)
+        circuit_list.append(circuit)
+        file_names.append(file_path.split("/")[-1])
+
+    # Visualizza i dati e i modelli adattati
+    visualize_data(frequencies_list, Z_list, Z_fit_list, circuit_list, file_names)
 
 
 if __name__ == "__main__":
