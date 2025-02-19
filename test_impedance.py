@@ -56,27 +56,24 @@ def visualize_data(frequencies_list, Z_list, Z_fit_list, circuit_list, file_name
         color = colors[i % len(colors)]  # Assegna un colore diverso per ogni dataset
 
         # **DIAGRAMMA DI NYQUIST**
-        h1, = plot_nyquist(Z, ax=ax_nyquist, fmt='o', color=color, label=f'Data {file_name}')
-        h2, = plot_nyquist(Z_fit, ax=ax_nyquist, fmt='-', color=color, label=f'Fit {file_name}')
-        handles_nyquist.extend([h1, h2])
+        plot_nyquist(Z, ax=ax_nyquist, fmt='o', color=color, label=f'Data {file_name}')
+        plot_nyquist(Z_fit, ax=ax_nyquist, fmt='-', color=color, label=f'Fit {file_name}')
 
         # **DIAGRAMMA DI BODE**
-        h_mag, h_phase = circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=[ax_bode_mag, ax_bode_phase])
-        handles_bode_mag.append(h_mag[0])  # Aggiunge il primo handle alla legenda
-        handles_bode_phase.append(h_phase[0])  # Aggiunge il primo handle alla legenda
+        circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=[ax_bode_mag, ax_bode_phase])
 
     # **Titoli e legende**
     ax_nyquist.set_title("Nyquist Diagram")
     ax_nyquist.set_xlabel("Re(Z) [Ohm]")
     ax_nyquist.set_ylabel("-Im(Z) [Ohm]")
-    ax_nyquist.legend(handles=handles_nyquist, loc="upper right")
+    ax_nyquist.legend()
     ax_nyquist.grid()
 
     ax_bode_mag.set_title("Bode Diagram - Magnitude")
     ax_bode_phase.set_title("Bode Diagram - Phase")
 
-    ax_bode_mag.legend(handles=handles_bode_mag, loc="upper right")
-    ax_bode_phase.legend(handles=handles_bode_phase, loc="upper right")
+    ax_bode_mag.legend()
+    ax_bode_phase.legend()
 
     ax_bode_mag.grid()
     ax_bode_phase.grid()
