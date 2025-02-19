@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import tkinter as tk
 from tkinter import filedialog
 from impedance.models.circuits import CustomCircuit
+from impedance.visualization import plot_nyquist
 
 def load_data(file_path):
     """Carica i dati dal file CSV in un formato compatibile."""
@@ -24,8 +25,8 @@ def define_circuit():
     circuit = CustomCircuit(circuit_string, initial_guess=initial_guess)
     return circuit
 
-def visualize_data(frequencies_list, Z_list, circuit_list, file_names):
-    """Visualizza i diagrammi di Nyquist e Bode per più dataset utilizzando `circuit.plot()`."""
+def visualize_data(frequencies_list, Z_list, Z_fit_list, circuit_list, file_names):
+    """Visualizza il diagramma di Nyquist e il diagramma di Bode per più dataset."""
     fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
     ax_nyquist = axes[0, 0]
@@ -34,20 +35,21 @@ def visualize_data(frequencies_list, Z_list, circuit_list, file_names):
 
     colors = ['b', 'g', 'r', 'c', 'm', 'y']  # Palette di colori
 
-    for i, (frequencies, Z, circuit, file_name) in enumerate(zip(frequencies_list, Z_list, circuit_list, file_names)):
+    for i, (frequencies, Z, Z_fit, circuit, file_name) in enumerate(zip(frequencies_list, Z_list, Z_fit_list, circuit_list, file_names)):
         color = colors[i % len(colors)]
 
         # **DIAGRAMMA DI NYQUIST**
-        circuit.plot(f_data=frequencies, Z_data=Z, kind='nyquist', ax=ax_nyquist, label=f'Dati {file_name}')
-        
+        plot_nyquist(Z, ax=ax_nyquist, marker='o', linestyle='', color=color, label=f'Dati {file_name}')
+        plot_nyquist(Z_fit, ax=ax_nyquist, linestyle='-', color=color, label=f'Fit {file_name}')
+
         # **DIAGRAMMA DI BODE**
         circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=[ax_bode_mag, ax_bode_phase])
 
     # **Aggiunta legende corrette**
+    ax_nyquist.legend()
     ax_nyquist.set_title("Nyquist Diagram")
     ax_nyquist.set_xlabel("Re(Z) [Ohm]")
     ax_nyquist.set_ylabel("-Im(Z) [Ohm]")
-    ax_nyquist.legend()
     ax_nyquist.grid()
 
     ax_bode_mag.set_title("Bode Diagram - Magnitude")
@@ -75,7 +77,7 @@ def main():
         print("Nessun file selezionato. Uscita dal programma.")
         return
 
-    frequencies_list, Z_list, circuit_list, file_names = [], [], [], []
+    frequencies_list, Z_list, Z_fit_list, circuit_list, file_names = [], [], [], [], []
 
     for file_path in file_paths:
         print(f"\nAnalizzando: {file_path.split('/')[-1]}")
@@ -83,15 +85,17 @@ def main():
         
         circuit = define_circuit()
         circuit.fit(frequencies, Z)
+        Z_fit = circuit.predict(frequencies)
 
         print(f"Estimated parameters for {file_path.split('/')[-1]}:", circuit.parameters_)
 
         frequencies_list.append(frequencies)
         Z_list.append(Z)
+        Z_fit_list.append(Z_fit)
         circuit_list.append(circuit)
         file_names.append(file_path.split('/')[-1])
 
-    visualize_data(frequencies_list, Z_list, circuit_list, file_names)
+    visualize_data(frequencies_list, Z_list, Z_fit_list, circuit_list, file_names)
 
 if __name__ == "__main__":
     main()
