@@ -37,7 +37,7 @@ def filter_data(frequencies, Z):
 def define_circuit():
     """Definisce il modello del circuito equivalente."""
     circuit_string = 'R0-p(R1,C1)-p(R2-Wo1,C2)'
-    initial_guess = [0.0001, 0.001, 1000, 0.001, 0.001, 1000, 0.01]
+    initial_guess = [0.01, 0.001, 10, 0.001, 0.001, 10, 1]
     circuit = CustomCircuit(circuit_string, initial_guess=initial_guess)
     return circuit
 
