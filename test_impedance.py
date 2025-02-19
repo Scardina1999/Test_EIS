@@ -9,7 +9,7 @@ from impedance.visualization import plot_nyquist
 
 
 def load_data(file_path):
-    """Carica i dati dal file CSV in un formato compatibile."""
+    """Carica i dati dal file CSV in un formato compatibile e ordina le frequenze."""
     df = pd.read_csv(file_path)
 
     if "FREQUENCY(Hz)" in df.columns and "R(ohm)" in df.columns and "X(ohm)" in df.columns:
@@ -40,31 +40,31 @@ def define_circuit():
 
 def visualize_data(frequencies_list, Z_list, Z_fit_list, circuit_list, file_names):
     """Visualizza il diagramma di Nyquist e il diagramma di Bode per più dataset."""
-    
-    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8))
 
     ax_nyquist = axes[0, 0]
     ax_bode_mag = axes[0, 1]
-    ax_bode_phase = axes[1, 1]
+    ax_bode_phase = axes[1, 0]
 
     for i, (frequencies, Z, Z_fit, circuit, file_name) in enumerate(zip(frequencies_list, Z_list, Z_fit_list, circuit_list, file_names)):
         # **DIAGRAMMA DI NYQUIST**
         plot_nyquist(Z, ax=ax_nyquist, fmt='o')
         plot_nyquist(Z_fit, ax=ax_nyquist, fmt='-')
-        
-        # **DIAGRAMMA DI BODE (Modulo e Fase)**
+
+        # **DIAGRAMMA DI BODE**
         circuit.plot(f_data=frequencies, Z_data=Z, kind='bode', ax=[ax_bode_mag, ax_bode_phase])
 
     # Titoli e legende
     ax_nyquist.set_title("Nyquist Diagram")
     ax_nyquist.set_xlabel("Re(Z) [Ohm]")
     ax_nyquist.set_ylabel("-Im(Z) [Ohm]")
-    ax_nyquist.legend(file_names, loc="best")
+    ax_nyquist.legend(file_names, loc="upper right")
     ax_nyquist.grid()
 
     ax_bode_mag.set_title("Bode Diagram - Magnitude")
     ax_bode_phase.set_title("Bode Diagram - Phase")
-    
+
     ax_bode_mag.grid()
     ax_bode_phase.grid()
 
@@ -76,7 +76,7 @@ def main():
     """Main function per la selezione e l'analisi di più file."""
     root = tk.Tk()
     root.withdraw()
-    
+
     # Seleziona più file CSV
     file_paths = filedialog.askopenfilenames(title="Seleziona i file CSV",
                                              filetypes=[("CSV files", "*.csv")])
@@ -100,7 +100,7 @@ def main():
         Z_fit = circuit.predict(frequencies)
 
         # Stampa i parametri stimati
-        print("Estimated parameters:", circuit.parameters_)
+        print(f"Estimated parameters for {file_path.split('/')[-1]}:", circuit.parameters_)
 
         # Memorizza i dati per la visualizzazione
         frequencies_list.append(frequencies)
