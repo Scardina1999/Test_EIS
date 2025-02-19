@@ -1,16 +1,16 @@
-# Analisi EIS con Python
+# 📊 Analisi di Impedenza Elettrochimica (EIS) con Python
 
 ## 📌 Descrizione
-Questo progetto utilizza **Python** e la libreria `impedance.py` per analizzare i dati di **Electrochemical Impedance Spectroscopy (EIS)**.  
-Viene applicato un modello di circuito equivalente per il fitting dei dati sperimentali.
+Questo progetto utilizza **Python** e la libreria `impedance.py` per analizzare i dati di **Electrochemical Impedance Spectroscopy (EIS)**. 
+L'analisi prevede il fitting dei dati sperimentali con un **modello di circuito equivalente**, permettendo il confronto di più set di dati.
 
 ---
 
 ## 📂 Struttura del Progetto
-- **`test_impedance.py`** → Script principale per analizzare i dati EIS.
+- **`test_impedance.py`** → Script principale per analizzare e confrontare più dati EIS.
 - **`test_impedance.ipynb`** → Versione notebook dello script, per un'esecuzione interattiva.
-- **`data.csv`** → File CSV contenente i dati di impedenza sperimentali.
-- **`risultati_fit.csv`** → File CSV con i parametri del circuito equivalente ottenuti dal fitting.
+- **`dati/`** → Cartella contenente i file CSV con i dati di impedenza sperimentali.
+- **`risultati_fit.csv`** → File CSV con i parametri stimati del circuito equivalente.
 - **`README.md`** → Documentazione del progetto.
 
 ---
@@ -25,36 +25,27 @@ conda activate test_eis
 
 ### 2️⃣ **Installare le Dipendenze**
 ```sh
-pip install impedance numpy scipy matplotlib pandas jupyterlab
+pip install impedance numpy scipy matplotlib pandas tkinter
 ```
 
 ### 3️⃣ **Eseguire lo Script**
 Per avviare l’analisi, eseguire:
 ```sh
-python test_impedence.py
-```
-Oppure, per eseguire il notebook:
-```sh
-jupyter lab
+python test_impedance.py
 ```
 
 ---
 
 ## 🔬 **Funzionamento del Codice**
 Lo script segue questi passaggi:
-1. **Carica i dati di impedenza da `dati.csv`**  
-2. **Filtra i dati**, mantenendo solo la parte utile del diagramma di Nyquist  
-3. **Definisce un circuito equivalente** (`R0-p(R1,C1)-p(R2-Wo1,C2)`)  
-4. **Adatta il modello ai dati sperimentali** con `impedance.py`  
-5. **Calcola l'errore medio** tra dati reali e modello  
-6. **Visualizza il diagramma di Nyquist** con i dati reali e il modello adattato  
-
----
-
-## 🛠️ **Possibili Miglioramenti**
-- ✅ Supporto per più modelli di circuiti equivalenti  
-- ✅ Aggiunta di un’interfaccia grafica  
-- ✅ Implementazione di un'analisi più dettagliata sui residui  
+1. **Selezione multipla di file CSV contenenti i dati di impedenza.**
+2. **Caricamento dei dati**: Frequenze, parte reale e immaginaria dell'impedenza.
+3. **Definizione del modello di circuito equivalente**: `R0-p(R1,C1)-p(R2-Wo1,C2)`.
+4. **Fitting del modello ai dati sperimentali** usando `impedance.py`.
+5. **Stampa dei parametri stimati per ciascun dataset.**
+6. **Visualizzazione dei risultati**:
+   - **Diagramma di Nyquist** per confrontare i dati sperimentali con il modello.
+   - **Diagramma di Bode** per visualizzare la risposta in frequenza in modulo e fase.
 
 ---
 
@@ -84,6 +75,4 @@ Grazie agli autori di `impedance.py` per aver sviluppato questa libreria! 🙌
 ---
 
 ## 🤖 **Autore**
-- **Antonio** - Ingegneria Elettrica e dell'Automazione @ UNIFI 🚀  
- 
-
+- **Antonio** - Ingegneria Elettrica e dell'Automazione @ UNIFI 🚀 
