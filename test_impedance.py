@@ -88,6 +88,10 @@ def main():
         Z_fit = circuit.predict(frequencies)
 
         print(f"Estimated parameters for {file_path.split('/')[-1]}:", circuit.parameters_)
+        
+        # Calcola l'errore quadratico medio (RMSE)
+        rmse = np.sqrt(np.mean(np.abs(Z - Z_fit) ** 2))
+        print(f"RMSE for {file_path.split('/')[-1]}: {rmse:.6e}")
 
         frequencies_list.append(frequencies)
         Z_list.append(Z)
